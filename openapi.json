@@ -2128,10 +2128,16 @@
                         ]
                     },
                     "first_kills": {
-                        "type": "integer"
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
                     },
                     "first_deaths": {
-                        "type": "integer"
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
                     },
                     "economy": {
                         "type": [
@@ -2410,11 +2416,20 @@
                                         "null"
                                     ]
                                 },
+                                "character_details": {
+                                    "type": [
+                                        "object",
+                                        "null"
+                                    ]
+                                },
                                 "competitive_tier": {
                                     "type": "integer",
                                     "minimum": 0,
                                     "maximum": 27,
                                     "description": "Competitive tier (0 = Unranked, 27 = Radiant)"
+                                },
+                                "tier_details": {
+                                    "$ref": "#/components/schemas/TierDetails"
                                 },
                                 "stats": {
                                     "type": "object"
