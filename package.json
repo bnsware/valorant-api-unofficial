@@ -1,0 +1,48 @@
+{
+  "name": "ugiapi",
+  "version": "1.2.0",
+  "description": "Unofficial Valorant API client for ugiAPI: rank, RR history, match history, stored matches with stats, leaderboards and webhooks. Zero dependencies.",
+  "type": "module",
+  "main": "./js/src/index.js",
+  "types": "./js/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./js/src/index.d.ts",
+      "default": "./js/src/index.js"
+    }
+  },
+  "files": [
+    "js/src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node js/test/test.mjs"
+  },
+  "keywords": [
+    "valorant",
+    "valorant-api",
+    "valorant-rank",
+    "valorant-stats",
+    "valorant-tracker",
+    "riot-games",
+    "rr",
+    "mmr",
+    "match-history",
+    "leaderboard",
+    "discord-bot",
+    "api-wrapper"
+  ],
+  "homepage": "https://api.ugilabs.com/docs/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bnsware/valorant-api-unofficial.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bnsware/valorant-api-unofficial/issues"
+  },
+  "license": "MIT"
+}

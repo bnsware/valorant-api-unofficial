@@ -1,0 +1,2818 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "ugiAPI",
+        "version": "1.2.0",
+        "description": "REST API for Valorant player data. All endpoints are GET and return `{\"status\":200,\"data\":{...}}`; errors return `{\"status\",\"error\",\"code\",\"request_id\",\"details?\"}` - branch on `code`.\n\nRate limits: per-minute and daily request quota plus a Riot query budget (only uncached lookups count). See https://api.ugilabs.com/docs/ and https://api.ugilabs.com/llms.txt."
+    },
+    "servers": [
+        {
+            "url": "https://api.ugilabs.com"
+        }
+    ],
+    "security": [
+        {
+            "bearerAuth": []
+        },
+        {
+            "apiKeyHeader": []
+        },
+        {
+            "apiKeyQuery": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "Account"
+        },
+        {
+            "name": "Rank"
+        },
+        {
+            "name": "Matches"
+        },
+        {
+            "name": "Leaderboard"
+        },
+        {
+            "name": "Content"
+        },
+        {
+            "name": "Status"
+        }
+    ],
+    "paths": {
+        "/v1/account/{name}/{tag}": {
+            "get": {
+                "operationId": "getAccount",
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Account by Riot ID",
+                "description": "PUUID, name, tag, account level, player card and title.",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/name"
+                    },
+                    {
+                        "$ref": "#/components/parameters/tag"
+                    },
+                    {
+                        "name": "region",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Region"
+                        }
+                    },
+                    {
+                        "name": "enrich",
+                        "in": "query",
+                        "description": "false skips level/card (cheaper)",
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "X-Cache": {
+                                "$ref": "#/components/headers/XCache"
+                            },
+                            "X-Upstream-Cost": {
+                                "$ref": "#/components/headers/XUpstreamCost"
+                            },
+                            "RateLimit": {
+                                "$ref": "#/components/headers/RateLimit"
+                            },
+                            "RateLimit-Policy": {
+                                "$ref": "#/components/headers/RateLimitPolicy"
+                            },
+                            "ETag": {
+                                "$ref": "#/components/headers/ETag"
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "status",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "const": 200
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Account"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified (If-None-Match matched the ETag)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/Unavailable"
+                    }
+                }
+            }
+        },
+        "/v1/by-puuid/account/{puuid}": {
+            "get": {
+                "operationId": "getAccountByPuuid",
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Account by PUUID",
+                "description": "Same as getAccount, looked up by PUUID.",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/puuid"
+                    },
+                    {
+                        "name": "region",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Region"
+                        }
+                    },
+                    {
+                        "name": "enrich",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "X-Cache": {
+                                "$ref": "#/components/headers/XCache"
+                            },
+                            "X-Upstream-Cost": {
+                                "$ref": "#/components/headers/XUpstreamCost"
+                            },
+                            "RateLimit": {
+                                "$ref": "#/components/headers/RateLimit"
+                            },
+                            "RateLimit-Policy": {
+                                "$ref": "#/components/headers/RateLimitPolicy"
+                            },
+                            "ETag": {
+                                "$ref": "#/components/headers/ETag"
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "status",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "const": 200
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Account"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified (If-None-Match matched the ETag)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/Unavailable"
+                    }
+                }
+            }
+        },
+        "/v1/rank/{region}/{name}/{tag}": {
+            "get": {
+                "operationId": "getRank",
+                "tags": [
+                    "Rank"
+                ],
+                "summary": "Current rank",
+                "description": "Current competitive tier and RR, all-time peak tier and a per-act summary (by_season).",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/region"
+                    },
+                    {
+                        "$ref": "#/components/parameters/name"
+                    },
+                    {
+                        "$ref": "#/components/parameters/tag"
+                    },
+                    {
+                        "$ref": "#/components/parameters/force"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "X-Cache": {
+                                "$ref": "#/components/headers/XCache"
+                            },
+                            "X-Upstream-Cost": {
+                                "$ref": "#/components/headers/XUpstreamCost"
+                            },
+                            "RateLimit": {
+                                "$ref": "#/components/headers/RateLimit"
+                            },
+                            "RateLimit-Policy": {
+                                "$ref": "#/components/headers/RateLimitPolicy"
+                            },
+                            "ETag": {
+                                "$ref": "#/components/headers/ETag"
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "status",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "const": 200
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Rank"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified (If-None-Match matched the ETag)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/Unavailable"
+                    }
+                }
+            }
+        },
+        "/v1/by-puuid/rank/{region}/{puuid}": {
+            "get": {
+                "operationId": "getRankByPuuid",
+                "tags": [
+                    "Rank"
+                ],
+                "summary": "Current rank by PUUID",
+                "description": "Same as getRank, looked up by PUUID.",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/region"
+                    },
+                    {
+                        "$ref": "#/components/parameters/puuid"
+                    },
+                    {
+                        "$ref": "#/components/parameters/force"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "X-Cache": {
+                                "$ref": "#/components/headers/XCache"
+                            },
+                            "X-Upstream-Cost": {
+                                "$ref": "#/components/headers/XUpstreamCost"
+                            },
+                            "RateLimit": {
+                                "$ref": "#/components/headers/RateLimit"
+                            },
+                            "RateLimit-Policy": {
+                                "$ref": "#/components/headers/RateLimitPolicy"
+                            },
+                            "ETag": {
+                                "$ref": "#/components/headers/ETag"
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "status",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "const": 200
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Rank"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified (If-None-Match matched the ETag)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/Unavailable"
+                    }
+                }
+            }
+        },
+        "/v1/rank-history/{region}/{name}/{tag}": {
+            "get": {
+                "operationId": "getRankHistory",
+                "tags": [
+                    "Rank"
+                ],
+                "summary": "Rank history",
+                "description": "Recent competitive updates (RR changes).",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/region"
+                    },
+                    {
+                        "$ref": "#/components/parameters/name"
+                    },
+                    {
+                        "$ref": "#/components/parameters/tag"
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 10,
+                            "default": 5
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/force"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "X-Cache": {
+                                "$ref": "#/components/headers/XCache"
+                            },
+                            "X-Upstream-Cost": {
+                                "$ref": "#/components/headers/XUpstreamCost"
+                            },
+                            "RateLimit": {
+                                "$ref": "#/components/headers/RateLimit"
+                            },
+                            "RateLimit-Policy": {
+                                "$ref": "#/components/headers/RateLimitPolicy"
+                            },
+                            "ETag": {
+                                "$ref": "#/components/headers/ETag"
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "status",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "const": 200
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/RankHistory"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified (If-None-Match matched the ETag)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/Unavailable"
+                    }
+                }
+            }
+        },
+        "/v1/by-puuid/rank-history/{region}/{puuid}": {
+            "get": {
+                "operationId": "getRankHistoryByPuuid",
+                "tags": [
+                    "Rank"
+                ],
+                "summary": "Rank history by PUUID",
+                "description": "Same as getRankHistory, looked up by PUUID.",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/region"
+                    },
+                    {
+                        "$ref": "#/components/parameters/puuid"
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 10,
+                            "default": 5
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/force"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "X-Cache": {
+                                "$ref": "#/components/headers/XCache"
+                            },
+                            "X-Upstream-Cost": {
+                                "$ref": "#/components/headers/XUpstreamCost"
+                            },
+                            "RateLimit": {
+                                "$ref": "#/components/headers/RateLimit"
+                            },
+                            "RateLimit-Policy": {
+                                "$ref": "#/components/headers/RateLimitPolicy"
+                            },
+                            "ETag": {
+                                "$ref": "#/components/headers/ETag"
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "status",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "const": 200
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/RankHistory"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified (If-None-Match matched the ETag)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/Unavailable"
+                    }
+                }
+            }
+        },
+        "/v1/matches/{region}/{name}/{tag}": {
+            "get": {
+                "operationId": "getMatches",
+                "tags": [
+                    "Matches"
+                ],
+                "summary": "Match history",
+                "description": "Recent matches with the player's stats. mode is applied by Riot before size; start pages through Riot's history (each new page costs one Riot query).",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/region"
+                    },
+                    {
+                        "$ref": "#/components/parameters/name"
+                    },
+                    {
+                        "$ref": "#/components/parameters/tag"
+                    },
+                    {
+                        "$ref": "#/components/parameters/matchSize"
+                    },
+                    {
+                        "$ref": "#/components/parameters/mode"
+                    },
+                    {
+                        "$ref": "#/components/parameters/start"
+                    },
+                    {
+                        "$ref": "#/components/parameters/force"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "X-Cache": {
+                                "$ref": "#/components/headers/XCache"
+                            },
+                            "X-Upstream-Cost": {
+                                "$ref": "#/components/headers/XUpstreamCost"
+                            },
+                            "RateLimit": {
+                                "$ref": "#/components/headers/RateLimit"
+                            },
+                            "RateLimit-Policy": {
+                                "$ref": "#/components/headers/RateLimitPolicy"
+                            },
+                            "ETag": {
+                                "$ref": "#/components/headers/ETag"
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "status",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "const": 200
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/MatchList"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified (If-None-Match matched the ETag)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/Unavailable"
+                    }
+                }
+            }
+        },
+        "/v1/by-puuid/matches/{region}/{puuid}": {
+            "get": {
+                "operationId": "getMatchesByPuuid",
+                "tags": [
+                    "Matches"
+                ],
+                "summary": "Match history by PUUID",
+                "description": "Same as getMatches, looked up by PUUID (name and tag are null).",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/region"
+                    },
+                    {
+                        "$ref": "#/components/parameters/puuid"
+                    },
+                    {
+                        "$ref": "#/components/parameters/matchSize"
+                    },
+                    {
+                        "$ref": "#/components/parameters/mode"
+                    },
+                    {
+                        "$ref": "#/components/parameters/start"
+                    },
+                    {
+                        "$ref": "#/components/parameters/force"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "X-Cache": {
+                                "$ref": "#/components/headers/XCache"
+                            },
+                            "X-Upstream-Cost": {
+                                "$ref": "#/components/headers/XUpstreamCost"
+                            },
+                            "RateLimit": {
+                                "$ref": "#/components/headers/RateLimit"
+                            },
+                            "RateLimit-Policy": {
+                                "$ref": "#/components/headers/RateLimitPolicy"
+                            },
+                            "ETag": {
+                                "$ref": "#/components/headers/ETag"
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "status",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "const": 200
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/MatchList"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified (If-None-Match matched the ETag)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/Unavailable"
+                    }
+                }
+            }
+        },
+        "/v1/stored-matches/{region}/{name}/{tag}": {
+            "get": {
+                "operationId": "getStoredMatches",
+                "tags": [
+                    "Matches"
+                ],
+                "summary": "Stored matches",
+                "description": "Matches kept in the ugiAPI match store (newest first) with a summary over all matching records. Reads only from the database: no Riot query cost except resolving the Riot ID. The store fills up as matches are fetched through ugiAPI; it can have gaps and summary.matches is not a lifetime count.",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/region"
+                    },
+                    {
+                        "$ref": "#/components/parameters/name"
+                    },
+                    {
+                        "$ref": "#/components/parameters/tag"
+                    },
+                    {
+                        "$ref": "#/components/parameters/mode"
+                    },
+                    {
+                        "$ref": "#/components/parameters/map"
+                    },
+                    {
+                        "$ref": "#/components/parameters/agent"
+                    },
+                    {
+                        "$ref": "#/components/parameters/season"
+                    },
+                    {
+                        "$ref": "#/components/parameters/storedSize"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "X-Cache": {
+                                "$ref": "#/components/headers/XCache"
+                            },
+                            "X-Upstream-Cost": {
+                                "$ref": "#/components/headers/XUpstreamCost"
+                            },
+                            "RateLimit": {
+                                "$ref": "#/components/headers/RateLimit"
+                            },
+                            "RateLimit-Policy": {
+                                "$ref": "#/components/headers/RateLimitPolicy"
+                            },
+                            "ETag": {
+                                "$ref": "#/components/headers/ETag"
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "status",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "const": 200
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/StoredMatches"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified (If-None-Match matched the ETag)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/Unavailable"
+                    }
+                }
+            }
+        },
+        "/v1/by-puuid/stored-matches/{region}/{puuid}": {
+            "get": {
+                "operationId": "getStoredMatchesByPuuid",
+                "tags": [
+                    "Matches"
+                ],
+                "summary": "Stored matches by PUUID",
+                "description": "Same as getStoredMatches, by PUUID (no Riot query at all).",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/region"
+                    },
+                    {
+                        "$ref": "#/components/parameters/puuid"
+                    },
+                    {
+                        "$ref": "#/components/parameters/mode"
+                    },
+                    {
+                        "$ref": "#/components/parameters/map"
+                    },
+                    {
+                        "$ref": "#/components/parameters/agent"
+                    },
+                    {
+                        "$ref": "#/components/parameters/season"
+                    },
+                    {
+                        "$ref": "#/components/parameters/storedSize"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "X-Cache": {
+                                "$ref": "#/components/headers/XCache"
+                            },
+                            "X-Upstream-Cost": {
+                                "$ref": "#/components/headers/XUpstreamCost"
+                            },
+                            "RateLimit": {
+                                "$ref": "#/components/headers/RateLimit"
+                            },
+                            "RateLimit-Policy": {
+                                "$ref": "#/components/headers/RateLimitPolicy"
+                            },
+                            "ETag": {
+                                "$ref": "#/components/headers/ETag"
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "status",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "const": 200
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/StoredMatches"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified (If-None-Match matched the ETag)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/Unavailable"
+                    }
+                }
+            }
+        },
+        "/v1/match/{matchId}": {
+            "get": {
+                "operationId": "getMatch",
+                "tags": [
+                    "Matches"
+                ],
+                "summary": "Match details",
+                "description": "Full match: info, all players with stats and combat, teams and rounds. Region is auto-detected when omitted.",
+                "parameters": [
+                    {
+                        "name": "matchId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "region",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Region"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "X-Cache": {
+                                "$ref": "#/components/headers/XCache"
+                            },
+                            "X-Upstream-Cost": {
+                                "$ref": "#/components/headers/XUpstreamCost"
+                            },
+                            "RateLimit": {
+                                "$ref": "#/components/headers/RateLimit"
+                            },
+                            "RateLimit-Policy": {
+                                "$ref": "#/components/headers/RateLimitPolicy"
+                            },
+                            "ETag": {
+                                "$ref": "#/components/headers/ETag"
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "status",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "const": 200
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/MatchDetail"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified (If-None-Match matched the ETag)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/Unavailable"
+                    }
+                }
+            }
+        },
+        "/v1/leaderboard/{region}": {
+            "get": {
+                "operationId": "getLeaderboard",
+                "tags": [
+                    "Leaderboard"
+                ],
+                "summary": "Ranked leaderboard",
+                "description": "Leaderboard page for an act (current act by default).",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/region"
+                    },
+                    {
+                        "name": "actId",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 200,
+                            "default": 50
+                        }
+                    },
+                    {
+                        "name": "start",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "X-Cache": {
+                                "$ref": "#/components/headers/XCache"
+                            },
+                            "X-Upstream-Cost": {
+                                "$ref": "#/components/headers/XUpstreamCost"
+                            },
+                            "RateLimit": {
+                                "$ref": "#/components/headers/RateLimit"
+                            },
+                            "RateLimit-Policy": {
+                                "$ref": "#/components/headers/RateLimitPolicy"
+                            },
+                            "ETag": {
+                                "$ref": "#/components/headers/ETag"
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "status",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "const": 200
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "act_id": {
+                                                    "type": "string"
+                                                },
+                                                "total_players": {
+                                                    "type": "integer"
+                                                },
+                                                "shard": {
+                                                    "type": "string"
+                                                },
+                                                "players": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "puuid": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "game_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "tag_line": {
+                                                                "type": "string"
+                                                            },
+                                                            "leaderboard_rank": {
+                                                                "type": "integer"
+                                                            },
+                                                            "ranked_rating": {
+                                                                "type": "integer"
+                                                            },
+                                                            "number_of_wins": {
+                                                                "type": "integer"
+                                                            },
+                                                            "competitive_tier": {
+                                                                "type": "integer",
+                                                                "minimum": 0,
+                                                                "maximum": 27,
+                                                                "description": "Competitive tier (0 = Unranked, 27 = Radiant)"
+                                                            },
+                                                            "tier_details": {
+                                                                "$ref": "#/components/schemas/TierDetails"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified (If-None-Match matched the ETag)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/Unavailable"
+                    }
+                }
+            }
+        },
+        "/v1/content": {
+            "get": {
+                "operationId": "getContent",
+                "tags": [
+                    "Content"
+                ],
+                "summary": "Game content",
+                "description": "Agents, maps, acts, game modes, player cards and titles.",
+                "parameters": [
+                    {
+                        "name": "locale",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "en-US",
+                                "tr-TR"
+                            ],
+                            "default": "en-US"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "X-Cache": {
+                                "$ref": "#/components/headers/XCache"
+                            },
+                            "X-Upstream-Cost": {
+                                "$ref": "#/components/headers/XUpstreamCost"
+                            },
+                            "RateLimit": {
+                                "$ref": "#/components/headers/RateLimit"
+                            },
+                            "RateLimit-Policy": {
+                                "$ref": "#/components/headers/RateLimitPolicy"
+                            },
+                            "ETag": {
+                                "$ref": "#/components/headers/ETag"
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "status",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "const": 200
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified (If-None-Match matched the ETag)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/Unavailable"
+                    }
+                }
+            }
+        },
+        "/v1/status/{region}": {
+            "get": {
+                "operationId": "getStatus",
+                "tags": [
+                    "Status"
+                ],
+                "summary": "Service status",
+                "description": "Riot service status for a region. No API key needed.",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/region"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "X-Cache": {
+                                "$ref": "#/components/headers/XCache"
+                            },
+                            "X-Upstream-Cost": {
+                                "$ref": "#/components/headers/XUpstreamCost"
+                            },
+                            "RateLimit": {
+                                "$ref": "#/components/headers/RateLimit"
+                            },
+                            "RateLimit-Policy": {
+                                "$ref": "#/components/headers/RateLimitPolicy"
+                            },
+                            "ETag": {
+                                "$ref": "#/components/headers/ETag"
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "status",
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "const": 200
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified (If-None-Match matched the ETag)"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/Unavailable"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "description": "Authorization: Bearer YOUR_KEY (recommended)"
+            },
+            "apiKeyHeader": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-API-Key"
+            },
+            "apiKeyQuery": {
+                "type": "apiKey",
+                "in": "query",
+                "name": "api_key",
+                "description": "Works, but ends up in logs."
+            }
+        },
+        "parameters": {
+            "region": {
+                "name": "region",
+                "in": "path",
+                "required": true,
+                "schema": {
+                    "$ref": "#/components/schemas/Region"
+                }
+            },
+            "name": {
+                "name": "name",
+                "in": "path",
+                "required": true,
+                "description": "Riot ID name",
+                "schema": {
+                    "type": "string"
+                }
+            },
+            "tag": {
+                "name": "tag",
+                "in": "path",
+                "required": true,
+                "description": "Riot ID tag",
+                "schema": {
+                    "type": "string"
+                }
+            },
+            "puuid": {
+                "name": "puuid",
+                "in": "path",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "format": "uuid"
+                }
+            },
+            "force": {
+                "name": "force",
+                "in": "query",
+                "description": "Premium only: skip the cache (once per 10 s per player and endpoint). Other plans: 400 force_not_allowed.",
+                "schema": {
+                    "type": "boolean"
+                }
+            },
+            "matchSize": {
+                "name": "size",
+                "in": "query",
+                "description": "Plan limit: Basic 5, Advanced 10, Premium 20.",
+                "schema": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 20,
+                    "default": 5
+                }
+            },
+            "mode": {
+                "name": "mode",
+                "in": "query",
+                "description": "Queue filter. Unknown values: 400 invalid_mode.",
+                "schema": {
+                    "type": "string",
+                    "enum": [
+                        "competitive",
+                        "unrated",
+                        "swiftplay",
+                        "spikerush",
+                        "deathmatch",
+                        "teamdeathmatch",
+                        "premier",
+                        "escalation",
+                        "replication",
+                        "snowball",
+                        "newmap",
+                        "custom"
+                    ]
+                }
+            },
+            "start": {
+                "name": "start",
+                "in": "query",
+                "description": "Index in Riot's match history (0 = latest). Use pagination.next_start.",
+                "schema": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000,
+                    "default": 0
+                }
+            },
+            "map": {
+                "name": "map",
+                "in": "query",
+                "description": "Map name, e.g. Ascent. Unknown: 400 invalid_map.",
+                "schema": {
+                    "type": "string"
+                }
+            },
+            "agent": {
+                "name": "agent",
+                "in": "query",
+                "description": "Agent name or UUID. Unknown: 400 invalid_agent.",
+                "schema": {
+                    "type": "string"
+                }
+            },
+            "season": {
+                "name": "season",
+                "in": "query",
+                "description": "Act UUID (see /v1/content acts).",
+                "schema": {
+                    "type": "string",
+                    "format": "uuid"
+                }
+            },
+            "storedSize": {
+                "name": "size",
+                "in": "query",
+                "description": "Plan limit: Basic 20, Advanced 50, Premium 100.",
+                "schema": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "default": 20
+                }
+            },
+            "page": {
+                "name": "page",
+                "in": "query",
+                "description": "1-based page number.",
+                "schema": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 1
+                }
+            }
+        },
+        "headers": {
+            "XCache": {
+                "description": "HIT or MISS",
+                "schema": {
+                    "type": "string",
+                    "enum": [
+                        "HIT",
+                        "MISS"
+                    ]
+                }
+            },
+            "XUpstreamCost": {
+                "description": "Riot queries spent by this request",
+                "schema": {
+                    "type": "integer"
+                }
+            },
+            "RateLimit": {
+                "description": "IETF draft: \"minute\";r=..;t=.., \"day\";..., \"riot-minute\";..., \"riot-day\";...",
+                "schema": {
+                    "type": "string"
+                }
+            },
+            "RateLimitPolicy": {
+                "description": "IETF draft: \"minute\";q=..;w=60, \"day\";q=..;w=86400, ...",
+                "schema": {
+                    "type": "string"
+                }
+            },
+            "ETag": {
+                "description": "Send as If-None-Match to get 304",
+                "schema": {
+                    "type": "string"
+                }
+            },
+            "RetryAfter": {
+                "description": "Seconds to wait",
+                "schema": {
+                    "type": "integer"
+                }
+            }
+        },
+        "responses": {
+            "BadRequest": {
+                "description": "Invalid input (bad_request, missing_parameters, invalid_region, invalid_name, invalid_tag, invalid_puuid, invalid_match_id, invalid_act, invalid_locale, invalid_mode, invalid_map, invalid_agent, invalid_parameter, force_not_allowed)",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "Unauthorized": {
+                "description": "api_key_missing, api_key_invalid",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "Forbidden": {
+                "description": "ip_not_allowed, origin_not_allowed",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "NotFound": {
+                "description": "player_not_found, not_found, endpoint_not_found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "TooManyRequests": {
+                "description": "rate_limited, daily_quota_exceeded, user_daily_quota_exceeded, upstream_budget_exceeded",
+                "headers": {
+                    "Retry-After": {
+                        "$ref": "#/components/headers/RetryAfter"
+                    }
+                },
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            },
+            "Unavailable": {
+                "description": "service_unavailable, maintenance",
+                "headers": {
+                    "Retry-After": {
+                        "$ref": "#/components/headers/RetryAfter"
+                    }
+                },
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "schemas": {
+            "Region": {
+                "type": "string",
+                "enum": [
+                    "eu",
+                    "na",
+                    "ap",
+                    "kr",
+                    "br",
+                    "latam"
+                ]
+            },
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "integer"
+                    },
+                    "error": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "request_id": {
+                        "type": "string"
+                    },
+                    "details": {
+                        "type": "object"
+                    }
+                },
+                "required": [
+                    "status",
+                    "error",
+                    "code",
+                    "request_id"
+                ]
+            },
+            "TierDetails": {
+                "type": [
+                    "object",
+                    "null"
+                ],
+                "properties": {
+                    "name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "icon": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    }
+                }
+            },
+            "Account": {
+                "type": "object",
+                "properties": {
+                    "puuid": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "tag": {
+                        "type": "string"
+                    },
+                    "account_level": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "card": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "title": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "card_details": {
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "title_details": {
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    }
+                }
+            },
+            "Rank": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "tag": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "puuid": {
+                        "type": "string"
+                    },
+                    "account_level": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "current_data": {
+                        "type": "object",
+                        "properties": {
+                            "currenttier": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 27,
+                                "description": "Competitive tier (0 = Unranked, 27 = Radiant)"
+                            },
+                            "currenttierpatched": {
+                                "type": "string"
+                            },
+                            "tier_details": {
+                                "$ref": "#/components/schemas/TierDetails"
+                            },
+                            "ranking_in_tier": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "wins": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "games": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "source_match_id": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "as_of": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "peak": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "description": "Highest tier across all acts (no RR).",
+                        "properties": {
+                            "tier": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 27,
+                                "description": "Competitive tier (0 = Unranked, 27 = Radiant)"
+                            },
+                            "tier_patched": {
+                                "type": "string"
+                            },
+                            "season_id": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "act": {
+                                "type": [
+                                    "object",
+                                    "null"
+                                ]
+                            },
+                            "source": {
+                                "type": "string",
+                                "enum": [
+                                    "win",
+                                    "final"
+                                ]
+                            }
+                        }
+                    },
+                    "by_season": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "season_id": {
+                                    "type": "string"
+                                },
+                                "act": {
+                                    "type": [
+                                        "object",
+                                        "null"
+                                    ]
+                                },
+                                "final_tier": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 27,
+                                    "description": "Competitive tier (0 = Unranked, 27 = Radiant)"
+                                },
+                                "final_tier_patched": {
+                                    "type": "string"
+                                },
+                                "final_rr": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "wins": {
+                                    "type": "integer"
+                                },
+                                "games": {
+                                    "type": "integer"
+                                },
+                                "leaderboard_rank": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "peak_win_tier": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "wins_by_tier": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "integer"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "RankHistory": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "tag": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "puuid": {
+                        "type": "string"
+                    },
+                    "history": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RankHistoryEntry"
+                        }
+                    }
+                }
+            },
+            "RankHistoryEntry": {
+                "type": "object",
+                "properties": {
+                    "match_id": {
+                        "type": "string"
+                    },
+                    "tier": {
+                        "type": "string"
+                    },
+                    "tier_id": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 27,
+                        "description": "Competitive tier (0 = Unranked, 27 = Radiant)"
+                    },
+                    "tier_details": {
+                        "$ref": "#/components/schemas/TierDetails"
+                    },
+                    "won": {
+                        "type": [
+                            "boolean",
+                            "null"
+                        ]
+                    },
+                    "map": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "map_details": {
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "game_mode": {
+                        "type": "string",
+                        "const": "competitive"
+                    },
+                    "date": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "season_id": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "tier_before_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "tier_before": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "tier_change": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "enum": [
+                            "promoted",
+                            "demoted",
+                            "none",
+                            null
+                        ]
+                    },
+                    "ranked_rating_before_update": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "ranked_rating_after_update": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "ranked_rating_earned": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "performance_bonus": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "refunded_rr": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "was_derank_protected": {
+                        "type": [
+                            "boolean",
+                            "null"
+                        ]
+                    },
+                    "afk_penalty": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "Combat": {
+                "type": [
+                    "object",
+                    "null"
+                ],
+                "description": "Derived from round data; null for matches cached before v1.2.0.",
+                "properties": {
+                    "shots": {
+                        "type": "object",
+                        "properties": {
+                            "head": {
+                                "type": "integer"
+                            },
+                            "body": {
+                                "type": "integer"
+                            },
+                            "leg": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "headshot_pct": {
+                        "type": [
+                            "number",
+                            "null"
+                        ]
+                    },
+                    "damage": {
+                        "type": "object",
+                        "properties": {
+                            "made": {
+                                "type": "integer"
+                            },
+                            "received": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "adr": {
+                        "type": [
+                            "number",
+                            "null"
+                        ]
+                    },
+                    "first_kills": {
+                        "type": "integer"
+                    },
+                    "first_deaths": {
+                        "type": "integer"
+                    },
+                    "economy": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "spent_total": {
+                                "type": "integer"
+                            },
+                            "spent_avg": {
+                                "type": "integer"
+                            },
+                            "loadout_value_avg": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                }
+            },
+            "MatchList": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "tag": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "puuid": {
+                        "type": "string"
+                    },
+                    "mode": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "total_matches": {
+                        "type": "integer"
+                    },
+                    "pagination": {
+                        "type": "object",
+                        "properties": {
+                            "start": {
+                                "type": "integer"
+                            },
+                            "size": {
+                                "type": "integer"
+                            },
+                            "returned": {
+                                "type": "integer"
+                            },
+                            "total": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "next_start": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            }
+                        }
+                    },
+                    "matches": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "match_id": {
+                                    "type": "string"
+                                },
+                                "map": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "map_details": {
+                                    "type": [
+                                        "object",
+                                        "null"
+                                    ]
+                                },
+                                "game_mode": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "game_start": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "format": "date-time"
+                                },
+                                "game_length_ms": {
+                                    "type": "integer"
+                                },
+                                "player": {
+                                    "type": [
+                                        "object",
+                                        "null"
+                                    ],
+                                    "properties": {
+                                        "puuid": {
+                                            "type": "string"
+                                        },
+                                        "team": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "character": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "character_details": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ]
+                                        },
+                                        "competitive_tier": {
+                                            "type": "integer",
+                                            "minimum": 0,
+                                            "maximum": 27,
+                                            "description": "Competitive tier (0 = Unranked, 27 = Radiant)"
+                                        },
+                                        "tier_details": {
+                                            "$ref": "#/components/schemas/TierDetails"
+                                        },
+                                        "stats": {
+                                            "type": "object",
+                                            "properties": {
+                                                "score": {
+                                                    "type": "integer"
+                                                },
+                                                "kills": {
+                                                    "type": "integer"
+                                                },
+                                                "deaths": {
+                                                    "type": "integer"
+                                                },
+                                                "assists": {
+                                                    "type": "integer"
+                                                },
+                                                "rounds_played": {
+                                                    "type": "integer"
+                                                }
+                                            }
+                                        },
+                                        "combat": {
+                                            "$ref": "#/components/schemas/Combat"
+                                        }
+                                    }
+                                },
+                                "teams": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "object",
+                                        "properties": {
+                                            "won": {
+                                                "type": "boolean"
+                                            },
+                                            "rounds_won": {
+                                                "type": "integer"
+                                            },
+                                            "rounds_played": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "MatchDetail": {
+                "type": "object",
+                "properties": {
+                    "match_info": {
+                        "type": "object",
+                        "properties": {
+                            "match_id": {
+                                "type": "string"
+                            },
+                            "map": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "map_details": {
+                                "type": [
+                                    "object",
+                                    "null"
+                                ]
+                            },
+                            "game_mode": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "is_ranked": {
+                                "type": "boolean"
+                            },
+                            "season_id": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "game_start": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "format": "date-time"
+                            },
+                            "region": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "game_length_ms": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "players": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "puuid": {
+                                    "type": "string"
+                                },
+                                "game_name": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "tag_line": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "team": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "character": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "competitive_tier": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 27,
+                                    "description": "Competitive tier (0 = Unranked, 27 = Radiant)"
+                                },
+                                "stats": {
+                                    "type": "object"
+                                },
+                                "ability_casts": {
+                                    "type": [
+                                        "object",
+                                        "null"
+                                    ]
+                                },
+                                "combat": {
+                                    "$ref": "#/components/schemas/Combat"
+                                }
+                            }
+                        }
+                    },
+                    "teams": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "team_id": {
+                                    "type": "string"
+                                },
+                                "won": {
+                                    "type": "boolean"
+                                },
+                                "rounds_won": {
+                                    "type": "integer"
+                                },
+                                "rounds_played": {
+                                    "type": "integer"
+                                },
+                                "num_points": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    },
+                    "rounds": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "round_num": {
+                                    "type": "integer"
+                                },
+                                "round_result": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "round_ceremony": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "winning_team": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "bomb_planter": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "bomb_defuser": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "plant_site": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "first_kill": {
+                                    "type": [
+                                        "object",
+                                        "null"
+                                    ],
+                                    "properties": {
+                                        "killer": {
+                                            "type": "string"
+                                        },
+                                        "victim": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "StoredMatches": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "tag": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "puuid": {
+                        "type": "string"
+                    },
+                    "region": {
+                        "type": "string",
+                        "description": "Riot shard (br/latam -> na)"
+                    },
+                    "filters": {
+                        "type": "object",
+                        "properties": {
+                            "mode": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "map": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "season": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "agent": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        }
+                    },
+                    "pagination": {
+                        "type": "object",
+                        "properties": {
+                            "page": {
+                                "type": "integer"
+                            },
+                            "size": {
+                                "type": "integer"
+                            },
+                            "returned": {
+                                "type": "integer"
+                            },
+                            "total": {
+                                "type": "integer"
+                            },
+                            "pages": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "summary": {
+                        "type": "object",
+                        "properties": {
+                            "matches": {
+                                "type": "integer"
+                            },
+                            "wins": {
+                                "type": "integer"
+                            },
+                            "losses": {
+                                "type": "integer"
+                            },
+                            "win_pct": {
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "kills": {
+                                "type": "integer"
+                            },
+                            "deaths": {
+                                "type": "integer"
+                            },
+                            "assists": {
+                                "type": "integer"
+                            },
+                            "kd": {
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "headshot_pct": {
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "adr": {
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "acs": {
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            },
+                            "first_match_at": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "format": "date-time"
+                            },
+                            "last_match_at": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "format": "date-time"
+                            }
+                        }
+                    },
+                    "matches": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "match_id": {
+                                    "type": "string"
+                                },
+                                "map": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "mode": {
+                                    "type": "string"
+                                },
+                                "season_id": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "started_at": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                },
+                                "game_length_ms": {
+                                    "type": "integer"
+                                },
+                                "player": {
+                                    "type": "object",
+                                    "properties": {
+                                        "team": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "agent": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "name": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "competitive_tier": {
+                                            "type": "integer",
+                                            "minimum": 0,
+                                            "maximum": 27,
+                                            "description": "Competitive tier (0 = Unranked, 27 = Radiant)"
+                                        },
+                                        "competitive_tier_patched": {
+                                            "type": "string"
+                                        },
+                                        "score": {
+                                            "type": "integer"
+                                        },
+                                        "kills": {
+                                            "type": "integer"
+                                        },
+                                        "deaths": {
+                                            "type": "integer"
+                                        },
+                                        "assists": {
+                                            "type": "integer"
+                                        },
+                                        "rounds_played": {
+                                            "type": "integer"
+                                        },
+                                        "shots": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "head": {
+                                                    "type": "integer"
+                                                },
+                                                "body": {
+                                                    "type": "integer"
+                                                },
+                                                "leg": {
+                                                    "type": "integer"
+                                                }
+                                            }
+                                        },
+                                        "headshot_pct": {
+                                            "type": [
+                                                "number",
+                                                "null"
+                                            ]
+                                        },
+                                        "damage": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "made": {
+                                                    "type": "integer"
+                                                },
+                                                "received": {
+                                                    "type": "integer"
+                                                }
+                                            }
+                                        },
+                                        "adr": {
+                                            "type": [
+                                                "number",
+                                                "null"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "result": {
+                                    "type": "object",
+                                    "properties": {
+                                        "won": {
+                                            "type": [
+                                                "boolean",
+                                                "null"
+                                            ]
+                                        },
+                                        "rounds_won": {
+                                            "type": "integer"
+                                        },
+                                        "rounds_lost": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

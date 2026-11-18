@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ugiapi"
+version = "1.2.0"
+description = "Unofficial Valorant API client for ugiAPI: rank, RR history, match history, stored matches with stats, leaderboards and webhooks."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+dependencies = ["requests>=2.20"]
+keywords = ["valorant", "valorant-api", "valorant-rank", "valorant-stats", "riot-games", "mmr", "rr", "match-history", "discord-bot"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Games/Entertainment",
+]
+
+[project.urls]
+Homepage = "https://api.ugilabs.com"
+Documentation = "https://api.ugilabs.com/docs/"
+Source = "https://github.com/bnsware/valorant-api-unofficial"
+
+[tool.setuptools]
+py-modules = ["ugiapi"]
