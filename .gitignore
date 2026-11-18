@@ -1,0 +1,10 @@
+node_modules/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.env
+.env.*
+.DS_Store
+Thumbs.db
